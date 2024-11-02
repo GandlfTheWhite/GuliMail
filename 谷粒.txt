@@ -1,0 +1,310 @@
+https://www.virtualbox.org/wiki/Downloads
+https://www.vagrantup.com/
+vagrant
+vagrant init centos/7
+在对应的目录下会生成一个vagrant文件
+vagrant up
+when centos7 is booting
+crtl c stop it
+and then connect it
+vagrant ssh
+whoami
+vagrant up	启动
+vagrant halt 关闭
+vagrant reload
+
+su root
+vagrant
+
+为了节省端口映射配置
+可以进虚拟机配置对应的网卡。
+也可以直接修改vagrant文件
+ipconfig/all
+config.vm.network"private_network",ip:"192.168.56.1"
+
+
+ip addr
+inet 192.168.56.10
+
+ping 192.168.56.10
+ping 192.168.3.5
+
+https://hub.docker.com/
+
+https://www.runoob.com/docker/centos-docker-install.html
+
+powercfg -h off
+
+//查看编辑yum配置
+sudo vi /etc/yum.repos.d/CentOS-Base.repo
+
+sudo yum install -y yum-utils \
+device-mapper-persistent-data \
+lvm2
+
+sudo yum-config-manager \
+  --add-repo \
+  https://download.docker.com/linux/centos/docker-ce.repo
+    
+sudo yum install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+sudo systemctl start docker
+
+//检查docker的版本
+docker -v
+
+//检查docker中的镜像
+sudo docker images
+
+//设置开机自动启动
+sudo systemctl enable docker
+
+配置docker阿里云镜像加速
+sudo mkdir -p /etc/docker
+sudo tee /etc/docker/daemon.json<<-'EOF'
+{
+  "registry-mirrors": ["https://docker.mirrors.ustc.edu.cn"]
+}
+
+EOF
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+
+
+//安装mysql
+sudo docker pull mysql:5.7
+
+//删除所有容器
+docker rm $(docker ps -a -q)
+
+//创建实例并启动
+docker run -p 3306:3306 --privileged=true --name mysql \
+ -v /mydata.mysql/log:/var/log/mysql \
+ -v /mydata.mysql/data:/var/lib/mysql \
+ -v /mydata.mysql/conf:/etc/mysql \
+ -e MYSQL_ROOT_PASSWORD=root \
+ -d mysql:5.7
+
+参数说明
+-p 3306:3306    ：将容器的3306端口映射到主机的3306端口
+-v /mydata.mysql/conf:/etc/mysql\         ：将容器内部的配置文件夹快捷映射到服务器上(挂载)
+-v /mydata.mysql/log:/var/log/mysql\      ：将docker中mysql的日志文件夹挂载到服务器
+-v /mydata.mysql/data:/var/lib/mysql\     ：将配置文件夹挂载到服务器
+-e MYSQL_ROOT_PASSWORD=root\              ：初始化root用户的密码
+
+//查看docker运行中的容器
+docker ps -a
+
+
+//查看日志
+docker logs mysql
+
+https://blog.csdn.net/qq_45564783/article/details/126440171
+
+docker run -d -e MYSQL_ROOT_PASSWORD=root mysql:5.7
+docker ps
+docker cp 3c0d616bfed7:/etc/mysql/ /mydata/mysql/conf
+docker cp 3c0d616bfed7:/etc/mysql/*.d /mydata/mysql/conf
+
+docker rm -f 3a0320f8f925f3c83197ef11170adfeed45f6f523d38b9465c6a4c8d95607372
+
+docker cp cc1c1e7374826dc22f11b0c8d799526923c1921df4a000192793be183b616d27:/etc/mysql/my.cnf /mydata/mysql/conf/mysql.conf.d
+
+docker rm -f cc1c1e7374826dc22f11b0c8d799526923c1921df4a000192793be183b616d27
+
+vi /mydata.mysql/conf/my.conf
+
+-- 创建子目录
+mkdir -p /mydata/mysql/conf/conf.d
+mkdir -p /mydata/mysql/conf/mysql.conf.d
+
+cd /mydata/mysql/conf
+
+一个docker容器就是一个linux虚拟机具体见下
+docker exec -it 容器id 或者容器的名字
+docker exec -it mysql /bin/bash
+
+数据库
+192.168.56.10
+密码root
+
+vi /mydata/mysql/conf/my.cnf
+
+[client]
+default-character-set=utf8
+
+[mysql]
+default-character-set=utf8
+
+[mysqld]
+init_connect='SET collation_connection = utf8_unicode_ci'
+init_connect='SET NAMES utf8'
+character-set-server=utf8
+collation-server=utf8_unicode_ci
+skip-character-set-client-handshake
+skip-name-resolve
+
+//跳过域名解析
+skip-name-resolve
+
+docker restart mysql
+
+
+配置redis过程相似
+因为没报错所以没记录
+
+接着查看java版本 1.8以上
+maven版本3.6以上
+配置maven阿里云镜像
+配置maven jdk1.8profiles
+配置idear默认使用刚才的maven仓库
+
+
+
+
+
+IPADDR=192.168.59.1
+GATEWAY=192.168.59.2
+NETMASK=255.255.255.0
+DNS1=218.4.4.4
+DNS2=8.8.8.8
+
+
+systemctl restart network
+
+
+the control process exited with error code .see"systemctl status network.service
+
+
+ip addr
+192.168.59.1
+
+apt-get适用于Ubuntu，Mint，Kali
+
+apt-get install tmux
+yum适用于Fedora，CentOS，RHEL
+
+sudo yum install tmux
+对于Arch Linux，使用以下命令
+
+packman -S tmux
+对于Mac OS X，使用以下命令
+brew install tmux
+
+
+
+
+ls /etc/yum.repos.d/
+yum.repos.bak
+ls /etc/yum.repos.d/yum.repos.bak
+CMS-Local.repo  EST-Local.repo  RCCP-Local.repo  RCDC-RCO-Local.repo  SDP-AGENT-Local.repo  yum.repos.bak
+
+
+cd /etc/yum.repos.d/
+mv CentOS-Base.repo CentOS-Base.repo.backup
+mv CentOS6-Base-163.repo CentOS6-Base-163.repo.backup
+wget http://mirrors.163.com/.help/CentOS6-Base-163.repo
+mv CentOS6-Base-163.repo CentOS-Base.repo
+yum clean all 
+yum makecache
+yum update
+
+
+rpm -ivh  http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm 
+#给出路径安装
+yum install epel-release 
+#用yum命令安装
+wget http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-2.noarch.rpm
+#先下载后安装
+rpm -vih epel-release-7-2.noarch.rpm
+
+sudo yum install Development tools
+sudo yum install gmp-devel db4 db4-devel ncurses-devel
+sudo wget https://sourceforge.net/projects/gnucobol/files/open-cobol/1.1/open-cobol-1.1.tar.gz
+tar zxvf open-cobol-1.1.tar.gz
+cd open-cobol-1.1
+./configure
+
+
+sudo vi /etc/profile
+
+export CPPFLAGS="-I/usr/include/libdb4"
+export LDFLAGS="-L/lib64/libdb4"
+export LD_LIBRARY_PATH="/lib64/libdb4"
+
+source /etc/profile
+
+
+rpm -qa|grep mysql 
+yum repolist all | grep mysql
+
+sudo yum remove -y mysql mysql-libs mysql-common
+ #卸载mysql 
+sudo rm -rf /var/lib/mysql
+ #删除mysql下的数据文件
+sudo rm /etc/my.cnf
+ #删除mysql配置文件 
+sudo yum remove -y mysql-community-release-el6-5.noarch
+sudo yum remove -y mysql-community-release-el7-5.noarch
+ #删除组件
+
+rm -f mysql*
+
+#下载rpm文件 
+sudo wget http://repo.mysql.com/mysql-community-release-el6-5.noarch.rpm 
+#执行rpm源文件 
+sudo rpm -ivh mysql-community-release-el6-5.noarch.rpm 
+#执行安装文件 ,安装过程中全部y继续向下执行
+sudo yum install mysql-community-server
+
+sudo wget http://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm 
+sudo rpm -ivh mysql-community-release-el7-5.noarch.rpm 
+sudo yum install mysql-community-server
+
+sudo vi /etc/my.cnf
+
+bind-address           = 172.20.10.7
+
+
+mysql -h 172.20.10.7 -u root -p
+/usr/bin/mysqladmin -u root password 'root' 
+#没有密码 有原来的密码则加 (原先密码为123)
+/usr/bin/mysqladmin -u root -p '123' password 'root'
+
+update user set Password=236458 where user='root';
+
+mysql -uroot -proot
+不用输入密码就行
+#命令说明
+-u:指定数据库用户名
+-p:指定数据库密码，-u和登录密码之间没有空格
+
+
+[mysqld]
+# MySQL设置大小写不敏感：默认：区分表名的大小写，不区分列名的大小写 
+# 0：大小写敏感 1：大小写不敏感 
+lower_case_table_names=1
+# 默认字符集 
+character-set-server=utf8
+
+systemctl restart mysqld
+
+#使用mysql数据库（真正的数据库，而非数据库软件），将所有数据库的所有表（*.*）的所有权限（all privileges），授予通过任何ip（%）访问的root用户，密码为root，最后刷新（flush privileges）即可。
+use mysql;
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'root' WITH GRANT OPTION;
+flush privileges;
+#查看授权信息
+show grants for root;
+
+socket=/var/lib/mysql/mysql.sock
+
+systemctl status mysqld
+   #查看mysql的服务状态
+systemctl restart mysqld
+  #重启mysql服务
+
+
+mysql数据库https://blog.csdn.net/weixin_44887042/article/details/109242719
+
+
+cobc -free -x -o LIST LIST.cob
